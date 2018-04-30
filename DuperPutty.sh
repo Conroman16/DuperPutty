@@ -2,14 +2,13 @@
 # A "superputty" like shell script using tmux/byobu
 # Based on http://linuxpixies.blogspot.jp/2011/06/tmux-copy-mode-and-how-to-control.html
 
-usage() {
+usage(){
     echo
     echo "####################################"
     echo "    WARNING: Options are missing"
     echo "####################################"
     echo 
-    #echo "$BNAME sessionname"
-    echo "EXAMPLE: ./superputty.sh SESSIONNAME USERNAME 'HOST1 HOST2 HOST3'"
+    echo "EXAMPLE: ./DuperPutty.sh SESSIONNAME USERNAME 'HOST1 HOST2 HOST3'"
     echo "NOTE: Don't forget the ' ' when specifying hosts"
     echo
     echo "####################################"
@@ -21,61 +20,55 @@ usage() {
     echo "-- CTL+B ] to enter scroll mode if text has gone past scroll back, hit CTL+C to cancel out"
     echo
 }
+ckdependencies(){
+    # GET OS Version first, just support CentOS and Ubuntu for now
+    # Query package manager for byobu and tmux
+    # Spit out install command if they are missing
 
-ckdependencies() {
-# GET OS Version first, just support CentOS and Ubuntu for now
-# Query package manager for byobu and tmux
-# Spit out install command if they are missing
-tmuxrc=`which tmux | wc -l`
-byoburc=`which byobu | wc -l`
+    tmuxrc=`which tmux | wc -l`
+    byoburc=`which byobu | wc -l`
 
-   if [ $tmuxrc = "0" ]; then 
+    if [ $tmuxrc = "0" ]; then 
         echo "tmux does not seem to be installed, please install"
-   elif [ $byoburc = "0" ]; then 
+    elif [ $byoburc = "0" ]; then 
         echo "byobu does not seem to be installed, please install"
-   else
-     startbyobu
-   fi
+    else
+        startbyobu
+    fi
 }
-
-startbyobu() {
-    echo 
-    echo $HOSTS
+startbyobu(){
+    printf "\n$HOSTS\n"
     if [ -z "$HOSTS" ]; then
        echo -n "Please provide of list of hosts separated by spaces [ENTER]: "
-       #read HOSTS
     fi
     
     byobu new-session -d -s $sessionname 
-    for i in $HOSTS
-    do
-    #byobu split-window -v -t $sessionname "ssh $i"
-    byobu new-window -t $sessionname "ssh -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o ServerAliveInterval=50 $username@$i"
-    #byobu new-window -t $sessionname "ssh -o StrictHostKeyChecking=no $username@$i"
-    byobu select-layout tiled
+
+    for i in $HOSTS; do
+        byobu new-window -t $sessionname "ssh -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o ServerAliveInterval=50 $username@$i.cdc.nicusa.com"
+        byobu select-layout tiled
     done
-    #tmux set-window-option synchronize-panes on
+
     byobu select-window -t 0
     byobu send-keys exit ENTER  
     byobu attach -t $sessionname
 
-BNAME=`basename $0`
+    BNAME=`basename $0`
+}
+help_cmd(){
+    usage
 }
 
-
-help_cmd()
-{
-usage
-}
-
+# If we weren't supplied with enough args, print usage info and exit
 if  [ $# -lt 1 ]; then
     usage
     exit 0
 fi
 
+# Set vars
 sessionname=$1
-#Use HOSTS variable to define hosts, figure this out later
-HOSTS="$3"
 username=$2
+HOSTS="$3"
+
+# Check our dependencies and startbyobu if all is well
 ckdependencies
-#startbyobu
