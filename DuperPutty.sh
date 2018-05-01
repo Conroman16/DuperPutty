@@ -6,18 +6,21 @@ echo
 username=""
 hosts=""
 dns_suffix=""
-sessionname="$(date +%d%h%H%M%S)"
+def_sessionname="$(date +%d%h%H%M%S)"
+sessionname=$def_sessionname
 _params_invalid=false
 _deps_invalid=false
+OPTIND=1 # Ensure we're starting from a known index
 
 print_help(){
 # Prints the help menu
-	printf "EXAMPLE: ./DuperPutty.sh -u USERNAME -i PATH_TO_HOST_ROSTER [-s SESSIONNAME] [-d DNSSUFFIX]\n\n"
+	echo   "EXAMPLE 1: ./DuperPutty.sh USERNAME 'HOST ROSTER' [-s SESSIONNAME] [-d DNSSUFFIX]"
+	printf "EXAMPLE 2: ./DuperPutty.sh -u USERNAME -i PATH_TO_HOST_ROSTER_FILE [-s SESSIONNAME] [-d DNSSUFFIX]\n\n"
 	echo   "OPTIONS:"
 	echo   "    u   User name"
-	echo   "    s   Session name"
 	echo   "    i   Input file containing hostnames"
-	echo   "    d   DNS suffix to appent to hostnames"
+	echo   "    d   DNS suffix to append to each hostname"
+	echo   "    s   Session name [defaults to current date/time (e.g. $def_sessionname)]"
 	printf "    h   Print this help menu\n\n"
 	echo   "HELPFUL HINTS:"
 	echo   "    F3 and F4 to move back and forth between sessions"
@@ -62,7 +65,19 @@ startbyobu(){
 	byobu attach -t $sessionname
 }
 parse_args(){
-# Parses flagged args using getopts
+# Parses and interprets script args
+
+	# Handle options specified without flags
+	if [[ -n "$1" && ! "$1" =~ ^- ]]; then
+		username="$1"
+		OPTIND=$((OPTIND + 1))
+	fi
+	if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+		hosts="$2"
+		OPTIND=$((OPTIND + 1))
+	fi
+
+	# Handle options specified with flags
 	while getopts ":hs:u:i:d:" opt; do
 		case ${opt} in
 			h ) # Help
