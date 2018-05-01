@@ -12,7 +12,7 @@ _deps_invalid=false
 
 print_help(){
 # Prints the help menu
-	printf "EXAMPLE: ./DuperPutty.sh -s SESSIONNAME -u USERNAME -i PATH_TO_FILE_CONTAINING_HOSTS\n\n"
+	printf "EXAMPLE: ./DuperPutty.sh -u USERNAME -i PATH_TO_HOST_ROSTER [-s SESSIONNAME] [-d DNSSUFFIX]\n\n"
 	echo   "OPTIONS:"
 	echo   "    u   User name"
 	echo   "    s   Session name"
