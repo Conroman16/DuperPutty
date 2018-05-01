@@ -114,7 +114,7 @@ if [ "$_deps_invalid" = true ]; then
 fi
 
 # Parse argmuents and validate them
-parse_args
+parse_args "$@"
 validate_params
 if [ "$_params_invalid" = true ]; then
 	echo
