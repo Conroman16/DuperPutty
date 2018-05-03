@@ -71,10 +71,11 @@ parse_args(){
 	if [[ -n "$1" && ! "$1" =~ ^- ]]; then
 		username="$1"
 		OPTIND=$((OPTIND + 1))
-	fi
-	if [[ -n "$2" && ! "$2" =~ ^- ]]; then
-		hosts="$2"
-		OPTIND=$((OPTIND + 1))
+
+		if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+			hosts="$2"
+			OPTIND=$((OPTIND + 1))
+		fi
 	fi
 
 	# Handle options specified with flags
