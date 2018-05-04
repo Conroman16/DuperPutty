@@ -50,8 +50,10 @@ ckdependencies(){
 }
 startbyobu(){
 # Fires up byobu and opens a window for each host
+	printf "Starting sessions"
 	byobu new-session -d -s $sessionname
 	for i in $hosts; do
+		printf '.' # Print a dot for each host as it's being processed
 		if [ -n "$dns_suffix" ]; then
 			_hname="$i.$dns_suffix"
 		else
@@ -72,6 +74,7 @@ parse_args(){
 		username="$1"
 		OPTIND=$((OPTIND + 1))
 
+		# Only parse out second arg if first one was specified without a flag
 		if [[ -n "$2" && ! "$2" =~ ^- ]]; then
 			hosts="$2"
 			OPTIND=$((OPTIND + 1))
