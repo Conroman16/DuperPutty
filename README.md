@@ -32,10 +32,11 @@ sudo apt install byobu
 
 - The reason for byobu is its simplified key bindings and general nicer ease of use (in my opinion).
 
-### Example:
+### Examples:
 
 ```
-./DupperPutty.sh <session_name> <username> 'HOST1 HOST2 HOST3'
+./DupperPutty.sh <username> 'HOST1 HOST2 HOST3'
+./DuperPutty.sh -u <username> -i /path/to/hosts/roster.txt [-s <session_name>]
 ```
 ![Syntax Example](https://github.com/amaturehr/DuperPutty/blob/master/.gifs/gif1.gif)
 
