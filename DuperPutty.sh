@@ -8,6 +8,8 @@ hosts=""
 dns_suffix=""
 def_sessionname="$(date +%d%h%H%M%S)"
 sessionname=$def_sessionname
+ssh_opts="-o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o ServerAliveInterval=60"
+closes_file="./closes.$sessionname.txt"
 _params_invalid=false
 _deps_invalid=false
 OPTIND=1 # Ensure we're starting from a known index
@@ -59,7 +61,8 @@ startbyobu(){
 		else
 			_hname="$i"
 		fi
-		byobu new-window -t $sessionname "ssh -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o ServerAliveInterval=50 $username@$_hname"
+		_dcmd='$(date +%H:%M.%S)'
+		byobu new-window -n "$i" -t $sessionname "ssh $ssh_opts $username@$_hname; echo \"$_dcmd - $i\" >> $closes_file"
 		byobu select-layout tiled
 	done
 	byobu select-window -t 0
