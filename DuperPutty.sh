@@ -9,10 +9,14 @@ dns_suffix=""
 def_sessionname="$(date +%d%h%H%M%S)"
 sessionname=$def_sessionname
 ssh_opts="-o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o ServerAliveInterval=60"
-closes_file="./closes.$sessionname.txt"
+logs_subdir="logs"
+closes_file="./$logs_subdir/closes.$sessionname.txt"
 _params_invalid=false
 _deps_invalid=false
 OPTIND=1 # Ensure we're starting from a known index
+
+# Ensure our logs dir exists
+mkdir -p "$(pwd)/$logs_subdir"
 
 print_help(){
 # Prints the help menu
@@ -62,7 +66,7 @@ startbyobu(){
 			_hname="$i"
 		fi
 		_dcmd='$(date +%H:%M.%S)'
-		byobu new-window -n "$i" -t $sessionname "ssh $ssh_opts $username@$_hname; echo \"$_dcmd - $i\" >> $closes_file"
+		byobu new-window -n "$i" -t $sessionname "ssh $ssh_opts $username@$_hname; echo \"$_dcmd - $i\" >> $closes_file; export BYOBU_RUN_DIR='/Users/connor.kennedy/Scripts/DuperPutty/$logs_subdir'; \033[18;5~"
 		byobu select-layout tiled
 	done
 	byobu select-window -t 0
@@ -72,15 +76,15 @@ startbyobu(){
 parse_args(){
 # Parses and interprets script args
 
-	# Handle options specified without flags
+	# Handle options specified without flags (args that don't start with '-')
 	if [[ -n "$1" && ! "$1" =~ ^- ]]; then
 		username="$1"
-		OPTIND=$((OPTIND + 1))
+		OPTIND=$((OPTIND + 1))  # Shift OPTIND to keep getopts in line
 
 		# Only parse out second arg if first one was specified without a flag
 		if [[ -n "$2" && ! "$2" =~ ^- ]]; then
 			hosts="$2"
-			OPTIND=$((OPTIND + 1))
+			OPTIND=$((OPTIND + 1))  # Shift OPTIND again
 		fi
 	fi
 
