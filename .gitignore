@@ -1,1 +1,3 @@
 closes*
+logs/**/*
+\.DS_Store
