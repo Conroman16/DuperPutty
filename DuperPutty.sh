@@ -3,7 +3,7 @@
 # Based on http://linuxpixies.blogspot.jp/2011/06/tmux-copy-mode-and-how-to-control.html
 echo
 
-username=""
+username="$USER"
 hosts=""
 dns_suffix=""
 def_sessionname="$(date +%d%h%H%M%S)"
@@ -65,8 +65,8 @@ startbyobu(){
 		else
 			_hname="$i"
 		fi
-		_dcmd='$(date +%H:%M.%S)'
-		byobu new-window -n "$i" -t $sessionname "ssh $ssh_opts $username@$_hname; echo \"$_dcmd - $i\" >> $closes_file; export BYOBU_RUN_DIR='/Users/connor.kennedy/Scripts/DuperPutty/$logs_subdir'; \033[18;5~"
+		_dcmd="$(date +%H:%M.%S)"
+		byobu new-window -n "$i" -t $sessionname "ssh $ssh_opts $username@$_hname; echo '$_dcmd - $i' >> $closes_file; export BYOBU_RUN_DIR='/Users/connor.kennedy/Scripts/DuperPutty/$logs_subdir'; \033[18;5~"
 		byobu select-layout tiled
 	done
 	byobu select-window -t 0
@@ -89,7 +89,7 @@ parse_args(){
 	fi
 
 	# Handle options specified with flags
-	while getopts ":hs:u:i:d:" opt; do
+	while getopts ":hs:u:i:d:H:" opt; do
 		case ${opt} in
 			h ) # Help
 				print_help
@@ -98,10 +98,16 @@ parse_args(){
 			i ) # Input file
 				if [ -z "$OPTARG" ]; then
 					echo "Hosts file path was not specified"
-					exit 0
-				else
-					hosts=$(read_hosts $OPTARG)
+					exit 2
 				fi
+				hosts=$(read_hosts $OPTARG)
+			;;
+			H ) # Raw space-delimited hosts input
+				if [ -z "$OPTARG" ]; then
+					echo "Space-delimited hosts list was not specified"
+					exit 2
+				fi
+				hosts="$OPTARG"
 			;;
 			d ) # DNS suffix
 				dns_suffix=$OPTARG
